@@ -21,6 +21,10 @@ class Creature(pygame.sprite.Sprite):
         self.collision = False
         self.speed = 5
 
+        self.alive = True
+
+        self.radars = []
+
     def update(self):
         self.vel_x = 0
         self.vel_y = 0
@@ -47,3 +51,9 @@ class Creature(pygame.sprite.Sprite):
         self.update()
         if not self.collision:
             pygame.draw.circle(screen, self.color, (self.x, self.y), 15)
+
+    def is_alive(self):
+        return self.alive
+
+    def get_data(self):
+        pass

@@ -47,7 +47,7 @@ def game_start(genomes, config):
         creatures.append(Creature(WIDTH / 2, 600, 15))
         ge.append(genome)
 
-    c1 = Creature(WIDTH / 2, 600, 15)
+    # c1 = Creature(WIDTH / 2, 600, 15)
 
     obs = []
     obstacle_1 = Obstacle(0, 200, WIDTH - 400, 15)
@@ -61,38 +61,44 @@ def game_start(genomes, config):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    c1.left_key = True
-                if event.key == pygame.K_RIGHT:
-                    c1.right_key = True
-                if event.key == pygame.K_UP:
-                    c1.up_key = True
-                if event.key == pygame.K_DOWN:
-                    c1.down_key = True
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    c1.left_key = False
-                if event.key == pygame.K_RIGHT:
-                    c1.right_key = False
-                if event.key == pygame.K_UP:
-                    c1.up_key = False
-                if event.key == pygame.K_DOWN:
-                    c1.down_key = False
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_LEFT:
+            #         c1.left_key = True
+            #     if event.key == pygame.K_RIGHT:
+            #         c1.right_key = True
+            #     if event.key == pygame.K_UP:
+            #         c1.up_key = True
+            #     if event.key == pygame.K_DOWN:
+            #         c1.down_key = True
+            # if event.type == pygame.KEYUP:
+            #     if event.key == pygame.K_LEFT:
+            #         c1.left_key = False
+            #     if event.key == pygame.K_RIGHT:
+            #         c1.right_key = False
+            #     if event.key == pygame.K_UP:
+            #         c1.up_key = False
+            #     if event.key == pygame.K_DOWN:
+            #         c1.down_key = False
 
-        c1.draw(screen)
+        for c in creatures:
+            c.draw(screen)
+
         obstacle_1.draw(screen)
         obstacle_2.draw(screen)
 
-        for ob in obs:
-            if ob.check_hit([c1.x, c1.y], c1.r):
-                c1.collision = True
+        for c in creatures:
+            for ob in obs:
+                if ob.check_hit([c.x, c.y], c.r):
+                    c.collision = True
 
-        if not c1.verify_bounds(WIDTH, HEIGHT):
-            c1.collision = True
+            if not c.verify_bounds(WIDTH, HEIGHT):
+                c.collision = True
 
-        if c1.collision:
-            c1 = Creature(WIDTH / 2, 600, 15)
+            if c.collision:
+                ge[creatures.index(c)].fitness -= 1
+                nets.pop(creatures.index(c))
+                ge.pop(creatures.index(c))
+                creatures.pop(creatures.index(c))
 
         draw_hud(screen)
         pygame.display.flip()
