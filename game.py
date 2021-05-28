@@ -63,28 +63,28 @@ def game_start(genomes, config):
                 sys.exit(0)
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_LEFT:
-            #         c1.left_key = True
+            #         creatures[0].left_key = True
             #     if event.key == pygame.K_RIGHT:
-            #         c1.right_key = True
+            #         creatures[0].right_key = True
             #     if event.key == pygame.K_UP:
-            #         c1.up_key = True
+            #         creatures[0].up_key = True
             #     if event.key == pygame.K_DOWN:
-            #         c1.down_key = True
+            #         creatures[0].down_key = True
             # if event.type == pygame.KEYUP:
             #     if event.key == pygame.K_LEFT:
-            #         c1.left_key = False
+            #         creatures[0].left_key = False
             #     if event.key == pygame.K_RIGHT:
-            #         c1.right_key = False
+            #         creatures[0].right_key = False
             #     if event.key == pygame.K_UP:
-            #         c1.up_key = False
+            #         creatures[0].up_key = False
             #     if event.key == pygame.K_DOWN:
-            #         c1.down_key = False
+            #         creatures[0].down_key = False
+
+        for ob in obs:
+            ob.draw(screen)
 
         for c in creatures:
-            c.draw(screen)
-
-        obstacle_1.draw(screen)
-        obstacle_2.draw(screen)
+            c.draw(screen, obs)
 
         for c in creatures:
             for ob in obs:

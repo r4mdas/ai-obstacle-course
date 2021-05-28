@@ -48,3 +48,11 @@ class Obstacle(pygame.sprite.Sprite):
         corner_y = circle_distance_y - rect.h / 2.0
         corner_distance_sq = corner_x ** 2.0 + corner_y ** 2.0
         return corner_distance_sq <= r ** 2.0
+
+    def collide_line(self, x, y):
+        rect = self.rect
+
+        if self.rect.x <= x <= self.rect.x + self.rect.width and self.rect.y <= y <= self.rect.y + self.rect.height:
+            return True
+
+        return False
