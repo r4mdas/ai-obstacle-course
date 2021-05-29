@@ -33,7 +33,7 @@ class Creature(pygame.sprite.Sprite):
         # print(self.radars)
         for radar in self.radars:
             position = radar[0]
-            pygame.draw.line(screen, (0, 255, 0), self.center, position, 3)
+            pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
     def check_radar_collision(self, screen: Surface, obs, x, y):
@@ -81,6 +81,7 @@ class Creature(pygame.sprite.Sprite):
         self.x += self.vel_x
         self.y += self.vel_y
 
+        self.center = [self.x, self.y]
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
         for d in range(0, 360, 90):

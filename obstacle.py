@@ -16,13 +16,6 @@ class Obstacle(pygame.sprite.Sprite):
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
-        # self.draw_radar(screen)
-
-    # def draw_radar(self, screen):
-    #     for radar in self.radars:
-    #         position = radar[0]
-    #         pygame.draw.line(screen, (0, 255, 0), self.rect.center, position, 1)
-    #         pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
     def check_hit(self, center, radius):
         return self.collide(center, radius) if self.rect else False
