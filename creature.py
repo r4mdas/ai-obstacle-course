@@ -23,16 +23,17 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 5
+        self.speed = 3
 
         self.alive = True
 
         self.radars = []
 
     def draw_radar(self, screen):
+        # print(self.radars)
         for radar in self.radars:
             position = radar[0]
-            pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
+            pygame.draw.line(screen, (0, 255, 0), self.center, position, 3)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
     def check_radar_collision(self, screen: Surface, obs, x, y):
@@ -81,7 +82,8 @@ class Creature(pygame.sprite.Sprite):
         self.y += self.vel_y
 
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
-        for d in range(0, 360, 45):
+        self.radars.clear()
+        for d in range(0, 360, 90):
             self.check_radar(d, screen, obs)
 
     def verify_bounds(self, screen_width, screen_height):
@@ -99,4 +101,15 @@ class Creature(pygame.sprite.Sprite):
         return self.alive
 
     def get_data(self):
-        pass
+        radars = self.radars
+        return_values = [0, 0, 0, 0]
+        for i, radar in enumerate(radars):
+            return_values[i] = int(radar[1] / 30)
+
+        return return_values
+
+    def set_keys(self, left, right, up, down):
+        self.left_key = left
+        self.right_key = right
+        self.up_key = up
+        self.down_key = down

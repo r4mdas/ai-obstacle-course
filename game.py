@@ -61,24 +61,28 @@ def game_start(genomes, config):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_LEFT:
-            #         creatures[0].left_key = True
-            #     if event.key == pygame.K_RIGHT:
-            #         creatures[0].right_key = True
-            #     if event.key == pygame.K_UP:
-            #         creatures[0].up_key = True
-            #     if event.key == pygame.K_DOWN:
-            #         creatures[0].down_key = True
-            # if event.type == pygame.KEYUP:
-            #     if event.key == pygame.K_LEFT:
-            #         creatures[0].left_key = False
-            #     if event.key == pygame.K_RIGHT:
-            #         creatures[0].right_key = False
-            #     if event.key == pygame.K_UP:
-            #         creatures[0].up_key = False
-            #     if event.key == pygame.K_DOWN:
-            #         creatures[0].down_key = False
+
+        for i, c in enumerate(creatures):
+            output = nets[i].activate(c.get_data())
+            choice = output.index(max(output))
+            # print(output)
+            # print(str(i) + ":" + str(choice))
+            if choice == 0:
+                creatures[i].set_keys(True, False, False, False)
+            elif choice == 1:
+                creatures[i].set_keys(False, True, False, False)
+            elif choice == 2:
+                creatures[i].set_keys(False, False, True, False)
+            elif choice == 3:
+                creatures[i].set_keys(False, False, False, True)
+            elif choice == 4:
+                creatures[i].set_keys(False, True, True, False)
+            elif choice == 5:
+                creatures[i].set_keys(False, True, False, True)
+            elif choice == 6:
+                creatures[i].set_keys(True, False, True, False)
+            elif choice == 7:
+                creatures[i].set_keys(True, False, False, True)
 
         for ob in obs:
             ob.draw(screen)
