@@ -2,6 +2,7 @@ import pygame
 from creature import Creature
 from obstacle import Obstacle
 import neat
+import math
 
 import os
 import sys
@@ -24,7 +25,6 @@ def draw_hud(screen):
 
 
 def game_start(genomes, config):
-
     global gen
 
     gen += 1
@@ -44,45 +44,30 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        creatures.append(Creature(WIDTH / 2, 600, 15))
+        creatures.append(Creature(genome_id, WIDTH / 2, 600, 15))
         ge.append(genome)
 
-    # c1 = Creature(WIDTH / 2, 600, 15)
+    obs = [Obstacle(200, 0, 50, HEIGHT),
+           Obstacle(800, 0, 50, HEIGHT),
 
-    obs = []
-    obstacle_1 = Obstacle(0, 200, WIDTH - 400, 15)
-    obs.append(obstacle_1)
-    obstacle_2 = Obstacle(WIDTH - 600, 300, 600, 15)
-    obs.append(obstacle_2)
-
-    while True:
+           Obstacle(200, HEIGHT-450, WIDTH - 600, 15),
+           Obstacle(WIDTH - 400, 200, 400, 15)]
+    # obs.append(Obstacle)
+    game_loop = True
+    while game_loop and len(creatures) > 0:
         screen.blit(game_surf, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                game_loop = False
                 sys.exit(0)
 
         for i, c in enumerate(creatures):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
+            c.set_input_choice(choice)
             # print(output)
             # print(str(i) + ":" + str(choice))
-            if choice == 0:
-                creatures[i].set_keys(True, False, False, False)
-            elif choice == 1:
-                creatures[i].set_keys(False, True, False, False)
-            elif choice == 2:
-                creatures[i].set_keys(False, False, True, False)
-            elif choice == 3:
-                creatures[i].set_keys(False, False, False, True)
-            elif choice == 4:
-                creatures[i].set_keys(False, True, True, False)
-            elif choice == 5:
-                creatures[i].set_keys(False, True, False, True)
-            elif choice == 6:
-                creatures[i].set_keys(True, False, True, False)
-            elif choice == 7:
-                creatures[i].set_keys(True, False, False, True)
 
         for ob in obs:
             ob.draw(screen)
@@ -90,7 +75,7 @@ def game_start(genomes, config):
         for c in creatures:
             c.draw(screen, obs)
 
-        for c in creatures:
+        for i, c in enumerate(creatures):
             for ob in obs:
                 if ob.check_hit([c.x, c.y], c.r):
                     c.collision = True
@@ -99,10 +84,12 @@ def game_start(genomes, config):
                 c.collision = True
 
             if c.collision:
-                ge[creatures.index(c)].fitness -= 1
+                ge[creatures.index(c)].fitness -= 20
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
+            else:
+                genomes[i][1].fitness = max(0, ((c.start_y - c.y) / 10) * 2)
 
         draw_hud(screen)
         pygame.display.flip()
