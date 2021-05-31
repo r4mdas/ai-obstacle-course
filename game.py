@@ -49,8 +49,8 @@ def game_start(genomes, config):
 
     obs = [Obstacle(200, 0, 50, HEIGHT),
            Obstacle(800, 0, 50, HEIGHT),
-
-           Obstacle(200, HEIGHT-450, WIDTH - 600, 15),
+           Obstacle(800-350, HEIGHT - 300, 250, 15),
+           Obstacle(200, HEIGHT-450, 300, 15),
            Obstacle(WIDTH - 400, 200, 400, 15)]
     # obs.append(Obstacle)
     game_loop = True

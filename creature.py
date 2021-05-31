@@ -25,7 +25,7 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 4
+        self.speed = 2
 
         self.alive = True
 
