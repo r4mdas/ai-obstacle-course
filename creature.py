@@ -6,10 +6,10 @@ from queue import Queue
 
 
 class Creature(pygame.sprite.Sprite):
-    def __init__(self, id, x, y, r):
+    def __init__(self, c_id, x, y, r):
         super(Creature, self).__init__()
 
-        self.id = 0
+        self.id = c_id
         self.x = x
         self.y = y
         self.r = r
@@ -25,15 +25,13 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 2
+        self.speed = 1
 
         self.alive = True
 
         self.radars = []
 
         self.start_y = self.y
-
-        self.previous_moves = Queue(maxsize=8)
 
     def draw_radar(self, screen):
         # print(self.radars)
@@ -72,6 +70,9 @@ class Creature(pygame.sprite.Sprite):
         dist = int(math.sqrt(math.pow(x - self.x, 2) + math.pow(y - self.y, 2)))
         self.radars.append([(x, y), dist])
 
+    def check_paralysis(self):
+        pass
+
     def update(self, screen, obs):
         self.vel_x = 0
         self.vel_y = 0
@@ -90,7 +91,9 @@ class Creature(pygame.sprite.Sprite):
         self.center = [self.x, self.y]
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
-        for d in range(0, 360, 90):
+
+        self.check_paralysis()
+        for d in range(0, 360, 45):
             self.check_radar(d, screen, obs)
 
     def verify_bounds(self, screen_width, screen_height):
@@ -109,20 +112,13 @@ class Creature(pygame.sprite.Sprite):
 
     def get_data(self):
         radars = self.radars
-        return_values = [0, 0, 0, 0]
+        return_values = [0, 0, 0, 0, 0, 0, 0, 0]
         for i, radar in enumerate(radars):
             return_values[i] = int(radar[1] / 30)
 
         return return_values
 
     def set_input_choice(self, choice):
-        # print(choice)
-        self.previous_moves.put(choice)
-        moves = list(self.previous_moves.queue)
-        # print(str(self.id) + " ---> ")
-        # print(moves)
-        if self.previous_moves.full():
-            self.previous_moves.get()
 
         if choice == 0:
             self.set_keys(True, False, True, False)
@@ -130,16 +126,16 @@ class Creature(pygame.sprite.Sprite):
             self.set_keys(False, True, True, False)
         elif choice == 2:
             self.set_keys(False, False, True, False)
-        # elif choice == 3:
-        #     self.set_keys(False, False, False, True)
-        # elif choice == 4:
-        #     self.set_keys(False, True, True, False)
-        # elif choice == 5:
-        #     self.set_keys(False, True, False, True)
-        # elif choice == 6:
-        #     self.set_keys(True, False, True, False)
-        # elif choice == 7:
-        #     self.set_keys(True, False, False, True)
+        elif choice == 3:
+            self.set_keys(False, False, False, True)
+        elif choice == 4:
+            self.set_keys(False, True, True, False)
+        elif choice == 5:
+            self.set_keys(False, True, False, True)
+        elif choice == 6:
+            self.set_keys(True, False, True, False)
+        elif choice == 7:
+            self.set_keys(True, False, False, True)
 
     def set_keys(self, left, right, up, down):
         self.left_key = left

@@ -2,8 +2,7 @@ import pygame
 from creature import Creature
 from obstacle import Obstacle
 import neat
-import math
-
+import random
 import os
 import sys
 
@@ -16,12 +15,42 @@ gen = 0
 pygame.font.init()
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
+ALLOWED_OBSTACLES = 20
+
 
 def draw_hud(screen):
     # generations
     global STAT_FONT
     score_label = STAT_FONT.render("Generations: " + str(gen - 1), 1, (255, 255, 255))
     screen.blit(score_label, (10, 10))
+
+
+def generate_obstacles():
+    start_x = 250
+    end_x = 800
+
+    left_wall = Obstacle(start_x, 0, 50, HEIGHT)
+    right_wall = Obstacle(end_x, 0, 50, HEIGHT)
+    obs = [left_wall, right_wall,
+           Obstacle(start_x + 200, 400, 150, 25),
+           Obstacle(start_x + 200, 400, 25, 150),
+           Obstacle(start_x + 200, 550, 150, 25),
+           Obstacle(start_x + 350, 400, 25, 50),
+           Obstacle(start_x + 350, 500, 25, 75)]
+
+    #     width = random.randint(15, 25)
+    #     height = 15
+    # for i in range(40):
+    #     ob = Obstacle(start_x + i*60, 400, 15, 25)
+    #     obs.append(ob)
+    # for i in range(ALLOWED_OBSTACLES):
+    #     width = random.randint(15, 25)
+    #     height = 15
+    #     x = random.randint(start_x, end_x - 30)
+    #     y = random.randint(0, HEIGHT - 300)
+    #     ob = Obstacle(x, y, width, height)
+    #     obs.append(ob)
+    return obs
 
 
 def game_start(genomes, config):
@@ -44,14 +73,11 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        creatures.append(Creature(genome_id, WIDTH / 2, 600, 15))
+        creatures.append(Creature(genome_id, 500, 530, 15))
         ge.append(genome)
 
-    obs = [Obstacle(200, 0, 50, HEIGHT),
-           Obstacle(800, 0, 50, HEIGHT),
-           Obstacle(800-350, HEIGHT - 300, 250, 15),
-           Obstacle(200, HEIGHT-450, 300, 15),
-           Obstacle(WIDTH - 400, 200, 400, 15)]
+    obs = generate_obstacles()
+
     # obs.append(Obstacle)
     game_loop = True
     while game_loop and len(creatures) > 0:
