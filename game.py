@@ -2,9 +2,9 @@ import pygame
 from creature import Creature
 from obstacle import Obstacle
 import neat
-import random
 import os
 import sys
+import math
 
 WIDTH = 1280
 HEIGHT = 720
@@ -16,13 +16,17 @@ pygame.font.init()
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
 ALLOWED_OBSTACLES = 20
+SECONDS_TO_LIVE = 10000
 
 
-def draw_hud(screen):
+def draw_hud(screen, creatures):
     # generations
     global STAT_FONT
     score_label = STAT_FONT.render("Generations: " + str(gen - 1), 1, (255, 255, 255))
     screen.blit(score_label, (10, 10))
+
+    alive_label = STAT_FONT.render("Alive: " + str(len(creatures)), 1, (255, 255, 255))
+    screen.blit(alive_label, (10, 50))
 
 
 def generate_obstacles():
@@ -56,6 +60,8 @@ def generate_obstacles():
 def game_start(genomes, config):
     global gen
 
+    elapsed_time = 0
+    target_x, target_y = (650, 470)
     gen += 1
     pygame.init()
     pygame.display.set_caption(CAPTION)
@@ -80,7 +86,14 @@ def game_start(genomes, config):
 
     # obs.append(Obstacle)
     game_loop = True
+
+    pre = 0
     while game_loop and len(creatures) > 0:
+
+        cur_second = int(elapsed_time/1000)
+        if cur_second is not pre:
+            print(cur_second)
+
         screen.blit(game_surf, (0, 0))
 
         for event in pygame.event.get():
@@ -94,6 +107,8 @@ def game_start(genomes, config):
             c.set_input_choice(choice)
             # print(output)
             # print(str(i) + ":" + str(choice))
+
+        pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
         for ob in obs:
             ob.draw(screen)
@@ -109,17 +124,25 @@ def game_start(genomes, config):
             if not c.verify_bounds(WIDTH, HEIGHT):
                 c.collision = True
 
-            if c.collision:
+            if c.collision or elapsed_time > SECONDS_TO_LIVE:
                 ge[creatures.index(c)].fitness -= 20
+                if elapsed_time > SECONDS_TO_LIVE:
+                    ge[creatures.index(c)].fitness = 0
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
-                genomes[i][1].fitness = max(0, ((c.start_y - c.y) / 10) * 2)
+                init_distance = int(math.sqrt((float(c.x)-target_x)**2 + (c.y-target_y)**2))
+                cur_distance = int(math.sqrt((float(c.start_x)-target_x)**2 + (c.start_y-target_y)**2))
+                if cur_distance > init_distance:
+                    genomes[i][1].fitness = 0
+                else:
+                    genomes[i][1].fitness = ((init_distance - cur_distance) * 100) / init_distance
 
-        draw_hud(screen)
+        draw_hud(screen, creatures)
         pygame.display.flip()
-        clock.tick(60)
+        dt = clock.tick(60)
+        elapsed_time += dt
 
 
 def run(config_file):

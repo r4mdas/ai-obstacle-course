@@ -25,12 +25,13 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 1
+        self.speed = 0.8
 
         self.alive = True
 
         self.radars = []
 
+        self.start_x = self.x
         self.start_y = self.y
 
     def draw_radar(self, screen):
