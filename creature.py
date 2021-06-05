@@ -2,7 +2,7 @@ import pygame
 import math
 from obstacle import Obstacle
 from pygame import Surface
-from queue import Queue
+from movequeue import Queue
 
 
 class Creature(pygame.sprite.Sprite):
@@ -25,7 +25,7 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 0.8
+        self.speed = 1.8
 
         self.alive = True
 
@@ -33,6 +33,8 @@ class Creature(pygame.sprite.Sprite):
 
         self.start_x = self.x
         self.start_y = self.y
+        self.moves = Queue()
+        self.move_str_queue = Queue()
 
     def draw_radar(self, screen):
         # print(self.radars)
@@ -63,7 +65,7 @@ class Creature(pygame.sprite.Sprite):
         y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
 
         # Define a length for the radar
-        while not self.check_radar_collision(screen, obs, x, y) and length < screen.get_width():
+        while not self.check_radar_collision(screen, obs, x, y) and length < 300:
             length = length + 1
             x = int(self.center[0] + math.cos(math.radians(360 - degree)) * length)
             y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
@@ -120,6 +122,18 @@ class Creature(pygame.sprite.Sprite):
         return return_values
 
     def set_input_choice(self, choice):
+        self.moves.add(choice)
+        if self.moves.len == 8:
+            self.move_str_queue.add(self.moves.get_str())
+            self.moves.poll()
+            # self.moves.print()
+
+        if self.move_str_queue.len == 10:
+            if self.move_str_queue.check_paralysis():
+
+                # print("Creature " + str(self.id) + " killed by paralysis")
+                return False
+            self.move_str_queue.poll()
 
         if choice == 0:
             self.set_keys(True, False, True, False)
@@ -137,6 +151,8 @@ class Creature(pygame.sprite.Sprite):
             self.set_keys(True, False, True, False)
         elif choice == 7:
             self.set_keys(True, False, False, True)
+
+        return True
 
     def set_keys(self, left, right, up, down):
         self.left_key = left

@@ -36,11 +36,12 @@ def generate_obstacles():
     left_wall = Obstacle(start_x, 0, 50, HEIGHT)
     right_wall = Obstacle(end_x, 0, 50, HEIGHT)
     obs = [left_wall, right_wall,
-           Obstacle(start_x + 200, 400, 150, 25),
-           Obstacle(start_x + 200, 400, 25, 150),
-           Obstacle(start_x + 200, 550, 150, 25),
-           Obstacle(start_x + 350, 400, 25, 50),
-           Obstacle(start_x + 350, 500, 25, 75)]
+           # Obstacle(start_x + 200, 400, 150, 25),
+           # Obstacle(start_x + 200, 400, 25, 150),
+           # Obstacle(start_x + 200, 550, 150, 25),
+           # Obstacle(start_x + 350, 400, 25, 50),
+           # Obstacle(start_x + 350, 500, 25, 75)
+           ]
 
     #     width = random.randint(15, 25)
     #     height = 15
@@ -79,6 +80,7 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
+        print(genome_id)
         creatures.append(Creature(genome_id, 500, 530, 15))
         ge.append(genome)
 
@@ -90,9 +92,10 @@ def game_start(genomes, config):
     pre = 0
     while game_loop and len(creatures) > 0:
 
-        cur_second = int(elapsed_time/1000)
+        cur_second = int(elapsed_time / 1000)
         if cur_second is not pre:
             print(cur_second)
+        pre = cur_second
 
         screen.blit(game_surf, (0, 0))
 
@@ -104,9 +107,12 @@ def game_start(genomes, config):
         for i, c in enumerate(creatures):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
-            c.set_input_choice(choice)
-            # print(output)
-            # print(str(i) + ":" + str(choice))
+            # if not
+            c.set_input_choice(choice)  # :
+            # ge[creatures.index(c)].fitness = 0
+            # nets.pop(creatures.index(c))
+            # ge.pop(creatures.index(c))
+            # creatures.pop(creatures.index(c))
 
         pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
@@ -124,18 +130,18 @@ def game_start(genomes, config):
             if not c.verify_bounds(WIDTH, HEIGHT):
                 c.collision = True
 
-            if c.collision or elapsed_time > SECONDS_TO_LIVE:
+            if c.collision:  # or elapsed_time > SECONDS_TO_LIVE:
                 ge[creatures.index(c)].fitness -= 20
-                if elapsed_time > SECONDS_TO_LIVE:
-                    ge[creatures.index(c)].fitness = 0
+                # if elapsed_time > SECONDS_TO_LIVE:
+                #    ge[creatures.index(c)].fitness -= 30
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
-                init_distance = int(math.sqrt((float(c.x)-target_x)**2 + (c.y-target_y)**2))
-                cur_distance = int(math.sqrt((float(c.start_x)-target_x)**2 + (c.start_y-target_y)**2))
+                init_distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (c.y - target_y) ** 2))
+                cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
                 if cur_distance > init_distance:
-                    genomes[i][1].fitness = 0
+                    genomes[i][1].fitness -= 20
                 else:
                     genomes[i][1].fitness = ((init_distance - cur_distance) * 100) / init_distance
 
