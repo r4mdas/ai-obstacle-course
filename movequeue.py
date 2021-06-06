@@ -38,6 +38,15 @@ class Queue:
     def print(self):
         print(self.get_str())
 
+    def get_as_list(self):
+        cur: Node = self.front
+        queue_list = []
+        while cur is not self.rear:
+            queue_list.append(cur.data)
+            cur = cur.next
+
+        return queue_list
+
     def get_str(self):
         cur: Node = self.front
         print_str = ""
@@ -46,22 +55,3 @@ class Queue:
             cur = cur.next
 
         return print_str
-
-    def check_paralysis(self):
-        cur: Node = self.front
-        queue_dict = dict()
-        while cur is not self.rear:
-            queue_dict[cur] = queue_dict.get(cur, 0) + 1
-            cur = cur.next
-
-        if len(queue_dict) == 2:
-            self.print()
-            pre_item = None
-            for item in queue_dict:
-                if pre_item is None:
-                    pre_item = item
-                else:
-                    if pre_item is not item:
-                        return False
-
-        return True

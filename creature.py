@@ -34,7 +34,7 @@ class Creature(pygame.sprite.Sprite):
         self.start_x = self.x
         self.start_y = self.y
         self.moves = Queue()
-        self.move_str_queue = Queue()
+        self.avg_moves = Queue()
 
     def draw_radar(self, screen):
         # print(self.radars)
@@ -73,9 +73,6 @@ class Creature(pygame.sprite.Sprite):
         dist = int(math.sqrt(math.pow(x - self.x, 2) + math.pow(y - self.y, 2)))
         self.radars.append([(x, y), dist])
 
-    def check_paralysis(self):
-        pass
-
     def update(self, screen, obs):
         self.vel_x = 0
         self.vel_y = 0
@@ -95,7 +92,7 @@ class Creature(pygame.sprite.Sprite):
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
 
-        self.check_paralysis()
+        # self.check_paralysis()
         for d in range(0, 360, 45):
             self.check_radar(d, screen, obs)
 
@@ -122,18 +119,42 @@ class Creature(pygame.sprite.Sprite):
         return return_values
 
     def set_input_choice(self, choice):
-        self.moves.add(choice)
+        self.moves.add((int(self.x), int(self.y)))
         if self.moves.len == 8:
-            self.move_str_queue.add(self.moves.get_str())
+            q_list = self.moves.get_as_list()
+            sum_x = 0
+            sum_y = 0
+
+            for x, y in q_list:
+                sum_x += x
+                sum_y += y
+
+            avg_x = sum_x / 8
+            avg_y = sum_y / 8
+            self.avg_moves.add((int(avg_x), int(avg_y)))
             self.moves.poll()
             # self.moves.print()
 
-        if self.move_str_queue.len == 10:
-            if self.move_str_queue.check_paralysis():
+        if self.avg_moves.len >= 10:
+            avg_list = self.avg_moves.get_as_list()
 
-                # print("Creature " + str(self.id) + " killed by paralysis")
+            max_diff_x = 0
+            max_diff_y = 0
+
+            for x, y in avg_list:
+                for a, b in avg_list:
+                    diff_x = abs(x - a)
+                    diff_y = abs(y - b)
+                    if diff_x > max_diff_x:
+                        max_diff_x = diff_x
+                    if diff_y > max_diff_y:
+                        max_diff_y = diff_y
+            # print((max_diff_x, max_diff_y))
+            if max_diff_x <= 3 and max_diff_y <= 3:
+                print("Creature " + str(self.id) + " killed by paralysis!")
                 return False
-            self.move_str_queue.poll()
+
+            self.avg_moves.poll()
 
         if choice == 0:
             self.set_keys(True, False, True, False)
