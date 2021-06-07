@@ -46,12 +46,13 @@ def generate_obstacles():
 
     left_wall = Obstacle(start_x, 0, 50, HEIGHT)
     right_wall = Obstacle(end_x, 0, 50, HEIGHT)
+
     obs = [left_wall, right_wall,
-           Obstacle(start_x + 200, 400, 150, 25),
-           Obstacle(start_x + 200, 400, 25, 150),
-           Obstacle(start_x + 200, 550, 150, 25),
-           Obstacle(start_x + 350, 400, 25, 50),
-           Obstacle(start_x + 350, 500, 25, 75)
+           # Obstacle(start_x + 200, 400, 150, 25),
+           # Obstacle(start_x + 200, 400, 25, 150),
+           # Obstacle(start_x + 200, 550, 150, 25),
+           # Obstacle(start_x + 350, 400, 25, 50),
+           # Obstacle(start_x + 350, 525, 25, 50)
            ]
 
     #     width = random.randint(15, 25)
@@ -73,12 +74,14 @@ def game_start(genomes, config):
     global gen
 
     elapsed_time = 0
-    target_x, target_y = (650, 470)
+    target_x, target_y = (WIDTH/2, 75)
     gen += 1
     pygame.init()
     pygame.display.set_caption(CAPTION)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
+
+    game_map = pygame.image.load('art/Maze.png').convert()
 
     game_surf = pygame.Surface((WIDTH, HEIGHT))
     game_surf.fill((200, 255, 0))
@@ -103,6 +106,7 @@ def game_start(genomes, config):
     pre = 0
     while game_loop and len(creatures) > 0:
         screen.blit(game_surf, (0, 0))
+        # screen.blit(game_map, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
