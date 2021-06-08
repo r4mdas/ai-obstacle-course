@@ -1,6 +1,5 @@
 import pygame
 from creature import Creature
-from obstacle import Obstacle
 import neat
 import os
 import sys
@@ -40,36 +39,6 @@ def draw_hud(screen, creatures, elapsed_time):
     screen.blit(time_label, (10, 90))
 
 
-def generate_obstacles():
-    start_x = 250
-    end_x = 800
-
-    left_wall = Obstacle(start_x, 0, 50, HEIGHT)
-    right_wall = Obstacle(end_x, 0, 50, HEIGHT)
-
-    obs = [left_wall, right_wall,
-           # Obstacle(start_x + 200, 400, 150, 25),
-           # Obstacle(start_x + 200, 400, 25, 150),
-           # Obstacle(start_x + 200, 550, 150, 25),
-           # Obstacle(start_x + 350, 400, 25, 50),
-           # Obstacle(start_x + 350, 525, 25, 50)
-           ]
-
-    #     width = random.randint(15, 25)
-    #     height = 15
-    # for i in range(40):
-    #     ob = Obstacle(start_x + i*60, 400, 15, 25)
-    #     obs.append(ob)
-    # for i in range(ALLOWED_OBSTACLES):
-    #     width = random.randint(15, 25)
-    #     height = 15
-    #     x = random.randint(start_x, end_x - 30)
-    #     y = random.randint(0, HEIGHT - 300)
-    #     ob = Obstacle(x, y, width, height)
-    #     obs.append(ob)
-    return obs
-
-
 def game_start(genomes, config):
     global gen
 
@@ -94,19 +63,19 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        print(genome_id)
+        # print(genome_id)
         creatures.append(Creature(genome_id, 500, 530, 15))
         ge.append(genome)
 
-    obs = generate_obstacles()
+    # obs = generate_obstacles()
 
     # obs.append(Obstacle)
     game_loop = True
 
-    pre = 0
+    # pre = 0
     while game_loop and len(creatures) > 0:
-        screen.blit(game_surf, (0, 0))
-        # screen.blit(game_map, (0, 0))
+        # screen.blit(game_surf, (0, 0))
+        screen.blit(game_map, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -117,6 +86,7 @@ def game_start(genomes, config):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
             if not c.set_input_choice(choice):
+                print("Popped by paralysis")
                 ge[creatures.index(c)].fitness -= 30
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
@@ -124,21 +94,22 @@ def game_start(genomes, config):
 
         pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
-        for ob in obs:
-            ob.draw(screen)
+        # for ob in obs:
+        #     ob.draw(screen)
 
         for c in creatures:
-            c.draw(screen, obs)
+            c.draw(screen, game_map)
 
         for i, c in enumerate(creatures):
-            for ob in obs:
-                if ob.check_hit([c.x, c.y], c.r):
-                    c.collision = True
+            # for ob in obs:
+            #     if ob.check_hit([c.x, c.y], c.r):
+            #         c.collision = True
 
             if not c.verify_bounds(WIDTH, HEIGHT):
                 c.collision = True
 
             if c.collision:  # or elapsed_time > SECONDS_TO_LIVE:
+                print("Popped by bounds collision")
                 ge[creatures.index(c)].fitness -= 20
                 # if elapsed_time > SECONDS_TO_LIVE:
                 #    ge[creatures.index(c)].fitness -= 30
