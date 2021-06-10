@@ -38,6 +38,13 @@ class Creature(pygame.sprite.Sprite):
         self.moves = Queue()
         self.avg_moves = Queue()
 
+        self.dtc = int(r/2)   # distance to center
+        self.collision_pts = [(self.x + self.dtc, self.y),
+                              (self.x - self.dtc, self.y),
+                              (self.x, self.y + self.dtc),
+                              (self.x, self.y - self.dtc)
+                              ]
+
     def draw_radar(self, screen):
         # print(self.radars)
         for radar in self.radars:
@@ -45,12 +52,20 @@ class Creature(pygame.sprite.Sprite):
             pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
-    def check_radar_collision(self, screen: Surface, x, y):
+    def check_radar_collision(self, screen: Surface, game_map: Surface):
 
-        if not screen.get_height() > y > 0:
+        if not screen.get_height() > self.y > 0:
             return True
-        if not screen.get_width() > x > 0:
+        if not screen.get_width() > self.x > 0:
             return True
+
+        for collision_point in self.collision_pts:
+            x, y = collision_point
+            pt = (int(x), int(y))
+
+            if game_map.get_at(pt) != BORDER_COLOR:
+                return True
+
         return False
 
     def check_radar(self, degree, screen, game_map: pygame.Surface):
@@ -86,6 +101,12 @@ class Creature(pygame.sprite.Sprite):
         self.y += self.vel_y
 
         self.center = [self.x, self.y]
+        self.collision_pts = [(self.x + self.dtc, self.y),
+                              (self.x - self.dtc, self.y),
+                              (self.x, self.y + self.dtc),
+                              (self.x, self.y - self.dtc)
+                              ]
+
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
 

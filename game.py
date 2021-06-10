@@ -105,8 +105,7 @@ def game_start(genomes, config):
             #     if ob.check_hit([c.x, c.y], c.r):
             #         c.collision = True
 
-            if not c.verify_bounds(WIDTH, HEIGHT):
-                c.collision = True
+            c.collision = c.check_radar_collision(screen, game_map)
 
             if c.collision:  # or elapsed_time > SECONDS_TO_LIVE:
                 print("Popped by bounds collision")
