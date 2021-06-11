@@ -1,6 +1,5 @@
 import pygame
 import math
-from obstacle import Obstacle
 from pygame import Surface
 from movequeue import Queue
 
@@ -38,12 +37,9 @@ class Creature(pygame.sprite.Sprite):
         self.moves = Queue()
         self.avg_moves = Queue()
 
-        self.dtc = int(r/2)   # distance to center
-        self.collision_pts = [(self.x + self.dtc, self.y),
-                              (self.x - self.dtc, self.y),
-                              (self.x, self.y + self.dtc),
-                              (self.x, self.y - self.dtc)
-                              ]
+        self.dtc = int(r)   # distance to center
+        self.collision_pts = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0),
+                              (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
 
     def draw_radar(self, screen):
         # print(self.radars)
@@ -51,6 +47,9 @@ class Creature(pygame.sprite.Sprite):
             position = radar[0]
             pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
+
+        for pt in self.collision_pts:
+            pygame.draw.circle(screen, (255, 255, 0), pt, 5)
 
     def check_radar_collision(self, screen: Surface, game_map: Surface):
 
@@ -101,16 +100,17 @@ class Creature(pygame.sprite.Sprite):
         self.y += self.vel_y
 
         self.center = [self.x, self.y]
-        self.collision_pts = [(self.x + self.dtc, self.y),
-                              (self.x - self.dtc, self.y),
-                              (self.x, self.y + self.dtc),
-                              (self.x, self.y - self.dtc)
-                              ]
+
+        idx = 0
+        for d in range(0, 360, 45):
+            x = int(self.center[0] + math.cos(math.radians(360 - d)) * self.dtc)
+            y = int(self.center[1] + math.sin(math.radians(360 - d)) * self.dtc)
+            self.collision_pts[idx] = (x, y)
+            idx += 1
 
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
 
-        # self.check_paralysis()
         for d in range(0, 360, 45):
             self.check_radar(d, screen, game_map)
 
@@ -151,7 +151,6 @@ class Creature(pygame.sprite.Sprite):
             avg_y = sum_y / 8
             self.avg_moves.add((int(avg_x), int(avg_y)))
             self.moves.poll()
-            # self.moves.print()
 
         if self.avg_moves.len >= 10:
             avg_list = self.avg_moves.get_as_list()
