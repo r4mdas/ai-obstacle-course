@@ -50,7 +50,7 @@ def game_start(genomes, config):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
-    game_map = pygame.image.load('art/Maze.png').convert()
+    game_map = pygame.image.load('art/Maze_blank.png').convert()
 
     game_surf = pygame.Surface((WIDTH, HEIGHT))
     game_surf.fill((200, 255, 0))
@@ -74,7 +74,6 @@ def game_start(genomes, config):
 
     # pre = 0
     while game_loop and len(creatures) > 0:
-        # screen.blit(game_surf, (0, 0))
         screen.blit(game_map, (0, 0))
 
         for event in pygame.event.get():
@@ -94,34 +93,24 @@ def game_start(genomes, config):
 
         pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
-        # for ob in obs:
-        #     ob.draw(screen)
-
         for c in creatures:
             c.draw(screen, game_map)
 
         for i, c in enumerate(creatures):
-            # for ob in obs:
-            #     if ob.check_hit([c.x, c.y], c.r):
-            #         c.collision = True
-
             c.collision = c.check_radar_collision(screen, game_map)
 
-            if c.collision:  # or elapsed_time > SECONDS_TO_LIVE:
+            if c.collision:
                 print("Popped by bounds collision")
                 ge[creatures.index(c)].fitness -= 20
-                # if elapsed_time > SECONDS_TO_LIVE:
-                #    ge[creatures.index(c)].fitness -= 30
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
-                init_distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (c.y - target_y) ** 2))
-                cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
-                # if cur_distance > init_distance:
-                #     genomes[i][1].fitness -= 20
-                # else:
-                genomes[i][1].fitness = ((init_distance - cur_distance) * 100) / init_distance
+                # init_distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (c.y - target_y) ** 2))
+                # cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
+                distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
+
+                genomes[i][1].fitness += int((1/distance))   # = ((init_distance - cur_distance) * 100) / init_distance
 
         draw_hud(screen, creatures, elapsed_time)
         pygame.display.flip()

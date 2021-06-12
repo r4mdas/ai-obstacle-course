@@ -26,7 +26,7 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 0.4
+        self.speed = 3
 
         self.alive = True
 
@@ -48,8 +48,8 @@ class Creature(pygame.sprite.Sprite):
             pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
-        for pt in self.collision_pts:
-            pygame.draw.circle(screen, (255, 255, 0), pt, 5)
+        # for pt in self.collision_pts:
+        #    pygame.draw.circle(screen, (255, 255, 0), pt, 5)
 
     def check_radar_collision(self, screen: Surface, game_map: Surface):
 
@@ -62,14 +62,15 @@ class Creature(pygame.sprite.Sprite):
             x, y = collision_point
             pt = (int(x), int(y))
 
-            if game_map.get_at(pt) != BORDER_COLOR:
+            if 0 < pt[0] < screen.get_width() and \
+                    0 < pt[1] < screen.get_height() and \
+                    game_map.get_at(pt) != BORDER_COLOR:
                 return True
 
         return False
 
     def check_radar(self, degree, screen, game_map: pygame.Surface):
         length = 0
-        # print(screen)
         x = int(self.center[0] + math.cos(math.radians(360 - degree)) * length)
         y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
 
@@ -80,6 +81,7 @@ class Creature(pygame.sprite.Sprite):
             length = length + 1
             x = int(self.center[0] + math.cos(math.radians(360 - degree)) * length)
             y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
+
         # Calculate Distance To Border And Append To Radars List
         dist = int(math.sqrt(math.pow(x - self.x, 2) + math.pow(y - self.y, 2)))
         self.radars.append([(x, y), dist])
