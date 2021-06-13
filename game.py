@@ -37,6 +37,7 @@ def draw_hud(screen, creatures, elapsed_time):
 
     time_label = STAT_FONT.render("Elapsed time: " + str(cur_time), False, (255, 255, 255))
     screen.blit(time_label, (10, 90))
+    return cur_time
 
 
 def game_start(genomes, config):
@@ -63,56 +64,60 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        # print(genome_id)
-        creatures.append(Creature(genome_id, 500, 530, 15))
+
+        creatures.append(Creature(genome_id, WIDTH/2, HEIGHT/2, 15))
         ge.append(genome)
 
-    # obs = generate_obstacles()
-
-    # obs.append(Obstacle)
     game_loop = True
 
-    # pre = 0
     while game_loop and len(creatures) > 0:
         screen.blit(game_map, (0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_loop = False
                 sys.exit(0)
 
         for i, c in enumerate(creatures):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
-            if not c.set_input_choice(choice):
-                print("Popped by paralysis")
-                ge[creatures.index(c)].fitness -= 30
-                nets.pop(creatures.index(c))
-                ge.pop(creatures.index(c))
-                creatures.pop(creatures.index(c))
 
-        pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
+            c.set_input_choice(choice)
+            # if not c.set_input_choice(choice):
+            # print("Popped by paralysis")
+            # ge[creatures.index(c)].fitness = 0
+            # nets.pop(creatures.index(c))
+            # ge.pop(creatures.index(c))
+            # creatures.pop(creatures.index(c))
+
+        # pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
         for c in creatures:
             c.draw(screen, game_map)
+
+        time = draw_hud(screen, creatures, elapsed_time)
 
         for i, c in enumerate(creatures):
             c.collision = c.check_radar_collision(screen, game_map)
 
             if c.collision:
-                print("Popped by bounds collision")
-                ge[creatures.index(c)].fitness -= 20
+                # print("Popped by bounds collision")
+                ge[creatures.index(c)].fitness = -10
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
                 # init_distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (c.y - target_y) ** 2))
                 # cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
-                distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
+                # distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
 
-                genomes[i][1].fitness += int((1/distance))   # = ((init_distance - cur_distance) * 100) / init_distance
+                genomes[i][1].fitness += time
+                # max(0, (1 - (distance/screen.get_height())))
+                # = ((init_distance - cur_distance) * 100) / init_distance
 
-        draw_hud(screen, creatures, elapsed_time)
+
+        if time > 12:
+            game_loop = False
+
         pygame.display.flip()
         dt = clock.tick(60)
         elapsed_time += dt

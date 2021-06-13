@@ -26,7 +26,7 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 3
+        self.speed = 7
 
         self.alive = True
 
@@ -170,7 +170,7 @@ class Creature(pygame.sprite.Sprite):
                         max_diff_y = diff_y
             # print((max_diff_x, max_diff_y))
             if max_diff_x <= 3 and max_diff_y <= 3:
-                print("Creature " + str(self.id) + " died by paralysis!")
+                # print("Creature " + str(self.id) + " died by paralysis!")
                 return False
 
             self.avg_moves.poll()
@@ -184,12 +184,8 @@ class Creature(pygame.sprite.Sprite):
         elif choice == 3:
             self.set_keys(False, False, False, True)
         elif choice == 4:
-            self.set_keys(False, True, True, False)
-        elif choice == 5:
             self.set_keys(False, True, False, True)
-        elif choice == 6:
-            self.set_keys(True, False, True, False)
-        elif choice == 7:
+        elif choice == 5:
             self.set_keys(True, False, False, True)
 
         return True
