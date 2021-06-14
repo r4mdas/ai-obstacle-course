@@ -81,7 +81,14 @@ def game_start(genomes, config):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
 
-            c.set_input_choice(choice)
+            c.action_on_input(choice)
+            # output_str = ''
+            # for s in output:
+            #     output_str += str(round(s, 3)) + ","
+
+            # print(output_str)
+
+            # c.set_input_choice(choice)
             # if not c.set_input_choice(choice):
             # print("Popped by paralysis")
             # ge[creatures.index(c)].fitness = 0
@@ -113,7 +120,6 @@ def game_start(genomes, config):
                 genomes[i][1].fitness += time
                 # max(0, (1 - (distance/screen.get_height())))
                 # = ((init_distance - cur_distance) * 100) / init_distance
-
 
         if time > 12:
             game_loop = False
