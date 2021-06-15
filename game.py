@@ -41,7 +41,7 @@ def draw_hud(screen, creatures, elapsed_time):
 
 
 def game_start(genomes, config):
-    global gen
+    global gen, event
 
     elapsed_time = 0
     target_x, target_y = (WIDTH/2, 75)
@@ -58,14 +58,16 @@ def game_start(genomes, config):
 
     nets = []
     creatures = []
+    sprites = []
     ge = []
 
     for genome_id, genome in genomes:
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-
-        creatures.append(Creature(genome_id, WIDTH/2, HEIGHT/2, 15))
+        c = Creature(1, WIDTH / 2, HEIGHT / 2, 15)
+        creatures.append(c)
+        sprites.append(pygame.sprite.Group(c))
         ge.append(genome)
 
     game_loop = True
@@ -80,8 +82,16 @@ def game_start(genomes, config):
         for i, c in enumerate(creatures):
             output = nets[i].activate(c.get_data())
             choice = output.index(max(output))
-
             c.action_on_input(choice)
+
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_RIGHT:
+            #         c.action_on_input(0)
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_LEFT:
+            #         c.action_on_input(1)
+            #
+
             # output_str = ''
             # for s in output:
             #     output_str += str(round(s, 3)) + ","
@@ -121,7 +131,7 @@ def game_start(genomes, config):
                 # max(0, (1 - (distance/screen.get_height())))
                 # = ((init_distance - cur_distance) * 100) / init_distance
 
-        if time > 12:
+        if time > 20:
             game_loop = False
 
         pygame.display.flip()

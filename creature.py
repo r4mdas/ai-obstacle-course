@@ -13,6 +13,19 @@ class Creature(pygame.sprite.Sprite):
     def __init__(self, c_id, x, y, r):
         super(Creature, self).__init__()
 
+        self.frames = 0
+        self.images = []
+        self.images.append(pygame.image.load('art/creature/creature-anim-1.png').convert_alpha())
+        self.images.append(pygame.image.load('art/creature/creature-anim-2.png').convert_alpha())
+        self.images.append(pygame.image.load('art/creature/creature-anim-3.png').convert_alpha())
+        self.images.append(pygame.image.load('art/creature/creature-anim-4.png').convert_alpha())
+
+        for i, img in enumerate(self.images):
+            self.images[i] = pygame.transform.scale(img, SCALE_ATTR)
+
+        self.index = 0
+        self.image = self.images[self.index]
+
         self.id = c_id
         self.x = x
         self.y = y
@@ -31,7 +44,7 @@ class Creature(pygame.sprite.Sprite):
         self.up_key = False
 
         self.collision = False
-        self.speed = 7
+        self.speed = 0.5
 
         self.alive = True
 
@@ -133,13 +146,19 @@ class Creature(pygame.sprite.Sprite):
     def draw(self, screen, game_map):
         self.update(screen, game_map)
         if self.alive:
-            self.img = pygame.image.load('art/creature.png').convert_alpha()
-            self.img = pygame.transform.scale(self.img, SCALE_ATTR)
-            self.img = pygame.transform.rotate(self.img, self.angle - 90)
+            self.frames += 1
+
+            if self.frames >= 3:
+                self.frames = 0
+                self.index += 1
+
+                if self.index >= len(self.images):
+                    self.index = 0
+
+                self.image = self.images[self.index]
+            self.img = self.image
+            self.img = pygame.transform.rotate(self.image, self.angle - 90)
             screen.blit(self.img, (self.x, self.y))
-            # pygame.draw.circle(screen, self.color, (self.x, self.y), 15)
-            # circle(screen, self.arrow_color, (self.x, self.y), 15)
-            # self.draw_radar(screen)
 
     def is_alive(self):
         return self.alive
@@ -154,13 +173,13 @@ class Creature(pygame.sprite.Sprite):
 
     def action_on_input(self, choice):
         if choice == 0:
-            self.angle += 5
+            self.angle += 2
         elif choice == 1:
-            self.angle -= 5
+            self.angle -= 2
         elif choice >= 2:
-            speed_choices = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]
+            speed_choices = [0.6, 0.7, 0.75, 0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2, 1.5]
             chosen_speed = random.choice(speed_choices)
-            self.speed = chosen_speed
+            self.speed = 2 * chosen_speed
 
         if self.angle != 0:
             self.angle = self.angle % 360
