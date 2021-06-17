@@ -20,6 +20,7 @@ class Creature(pygame.sprite.Sprite):
         self.images.append(pygame.image.load('art/creature/creature-anim-2.png').convert_alpha())
         self.images.append(pygame.image.load('art/creature/creature-anim-3.png').convert_alpha())
         self.images.append(pygame.image.load('art/creature/creature-anim-4.png').convert_alpha())
+        # self.images.append(pygame.image.load('art/square.png').convert())
 
         for i, img in enumerate(self.images):
             self.images[i] = pygame.transform.scale(img, SCALE_ATTR)
@@ -37,14 +38,12 @@ class Creature(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, 50, 50)
         self.center = [self.x, self.y]
         self.color = (0, 100, 255)
-        self.arrow_color = (100, 200, 25)
 
         self.left_key = False
         self.right_key = False
         self.down_key = False
         self.up_key = False
 
-        self.collider = CreatureCollider(self.x, self.y, SCALE_ATTR[0], SCALE_ATTR[1])
         self.collision = False
         self.speed = 0.5
 
@@ -52,16 +51,16 @@ class Creature(pygame.sprite.Sprite):
 
         self.radars = []
 
-        self.start_x = self.x
-        self.start_y = self.y
-        self.moves = Queue()
-        self.avg_moves = Queue()
-
-        self.dtc = int(SCALE_ATTR[0]/2)   # distance to center
-        self.collision_pts = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0),
-                              (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
         self.angle = 0
+
+    def rotate_center(self, image):
+        rectangle = image.get_rect()
+        rotated_image = pygame.transform.rotate(image, self.angle)
+        rotated_rectangle = rectangle.copy()
+        rotated_rectangle.center = rotated_image.get_rect().center
+        rotated_image = rotated_image.subsurface(rotated_rectangle).copy()
+
+        return rotated_image
 
     def draw_radar(self, screen):
         for radar in self.radars:
@@ -76,14 +75,14 @@ class Creature(pygame.sprite.Sprite):
         if not screen.get_width() > self.x > 0:
             return True
 
-        for collision_point in self.collision_pts:
-            x, y = collision_point
-            pt = (int(x), int(y))
-
-            if 0 < pt[0] < screen.get_width() and \
-                    0 < pt[1] < screen.get_height() and \
-                    game_map.get_at(pt) != BORDER_COLOR:
-                return True
+        # for collision_point in self.collision_pts:
+        #     x, y = collision_point
+        #     pt = (int(x), int(y))
+        #
+        #     if 0 < pt[0] < screen.get_width() and \
+        #             0 < pt[1] < screen.get_height() and \
+        #             game_map.get_at(pt) != BORDER_COLOR:
+        #         return True
 
         return False
 
@@ -151,9 +150,16 @@ class Creature(pygame.sprite.Sprite):
                 self.image = self.images[self.index]
             self.img = self.image
             self.img = pygame.transform.rotate(self.image, self.angle - 90)
+            # self.img = self.rotate_center(self.img)
             screen.blit(self.img, (self.x, self.y))
 
-            self.collider.drawCollider(screen, self.x, self.y)
+            # length = 0.5 * SCALE_ATTR[0]
+            # left_top = [self.x + math.cos(math.radians(360 - (self.angle - 90))) * length,
+            #             self.y + math.sin(math.radians(360 - (self.angle - 90))) * length]
+            # pygame.draw.circle(screen, (255, 255, 0), left_top, 5)
+
+            # pygame.transform.rotate(self.collider, self.angle)
+            # self.collider.drawCollider(screen, self.x, self.y)
             # for pt in self.collision_pts:
             #     pygame.draw.circle(screen, (255, 255, 0), pt, 5)
 

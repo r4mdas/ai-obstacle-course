@@ -58,7 +58,6 @@ def game_start(genomes, config):
 
     nets = []
     creatures = []
-    sprites = []
     ge = []
 
     for genome_id, genome in genomes:
@@ -67,7 +66,6 @@ def game_start(genomes, config):
         nets.append(net)
         c = Creature(1, WIDTH / 2, HEIGHT / 2, 15)
         creatures.append(c)
-        sprites.append(pygame.sprite.Group(c))
         ge.append(genome)
 
     game_loop = True
@@ -110,6 +108,9 @@ def game_start(genomes, config):
 
         for c in creatures:
             c.draw(screen, game_map)
+            # gets_hit = pygame.sprite.collide_circle(c, c)
+            # if gets_hit:
+            #     print("Creature " + str(c.id) + " got hit!")
 
         time = draw_hud(screen, creatures, elapsed_time)
 
