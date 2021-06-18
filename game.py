@@ -51,7 +51,7 @@ def game_start(genomes, config):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
-    game_map = pygame.image.load('art/Maze_blank.png').convert()
+    game_map = pygame.image.load('art/Maze.png').convert()
 
     game_surf = pygame.Surface((WIDTH, HEIGHT))
     game_surf.fill((200, 255, 0))
@@ -64,7 +64,7 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        c = Creature(1, WIDTH / 2, HEIGHT / 2, 15)
+        c = Creature(1, WIDTH / 2 - 250, HEIGHT - 380, 15)
         creatures.append(c)
         ge.append(genome)
 

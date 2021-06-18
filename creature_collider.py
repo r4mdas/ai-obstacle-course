@@ -4,7 +4,7 @@ import math
 
 class CreatureCollider(pygame.Surface):
     def __init__(self, x, y, w, h):
-        super(CreatureCollider, self).__init__()
+        super(self).__init__()
 
         self.w = w
         self.h = h

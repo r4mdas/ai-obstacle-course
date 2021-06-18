@@ -1,7 +1,6 @@
 import pygame
 import math
 from pygame import Surface
-from movequeue import Queue
 import random
 from creature_collider import CreatureCollider
 
@@ -52,10 +51,12 @@ class Creature(pygame.sprite.Sprite):
         self.radars = []
 
         self.angle = 0
+        self.collision_pts = [(0, 0), (0, 0), (0, 0), (0, 0)
+                              , (0, 0), (0, 0), (0, 0), (0, 0)]
 
     def rotate_center(self, image):
         rectangle = image.get_rect()
-        rotated_image = pygame.transform.rotate(image, self.angle)
+        rotated_image = pygame.transform.rotate(image, self.angle - 90)
         rotated_rectangle = rectangle.copy()
         rotated_rectangle.center = rotated_image.get_rect().center
         rotated_image = rotated_image.subsurface(rotated_rectangle).copy()
@@ -75,14 +76,14 @@ class Creature(pygame.sprite.Sprite):
         if not screen.get_width() > self.x > 0:
             return True
 
-        # for collision_point in self.collision_pts:
-        #     x, y = collision_point
-        #     pt = (int(x), int(y))
-        #
-        #     if 0 < pt[0] < screen.get_width() and \
-        #             0 < pt[1] < screen.get_height() and \
-        #             game_map.get_at(pt) != BORDER_COLOR:
-        #         return True
+        for collision_point in self.collision_pts:
+            x, y = collision_point
+            pt = (int(x), int(y))
+
+            if 0 < pt[0] < screen.get_width() and \
+                    0 < pt[1] < screen.get_height() and \
+                    game_map.get_at(pt) != BORDER_COLOR:
+                return True
 
         return False
 
@@ -110,19 +111,20 @@ class Creature(pygame.sprite.Sprite):
 
         self.center = [self.x, self.y]
 
-        # idx = 0
-        # for d in range(0, 360, 45):
-        #     x = int(self.center[0] + math.cos(math.radians(360 - d))
-        #             * self.dtc)
-        #     y = int(self.center[1] + math.sin(math.radians(360 - d))
-        #             * self.dtc)
-        #     scale_x, scale_y = SCALE_ATTR
-        #
-        #     x = int(x + math.cos(math.radians(360 - d)))
-        #     y = int(y + math.sin(math.radians(360 - self.angle)))
-        #     self.collision_pts[idx] = (x + int(scale_x/2), y + int(scale_y/2))
-        #
-        #     idx += 1
+        idx = 0
+        dtc = (SCALE_ATTR[0] / 2)
+        for d in range(0, 360, 45):
+            x = int(self.center[0] + math.cos(math.radians(360 - d))
+                    * dtc)
+            y = int(self.center[1] + math.sin(math.radians(360 - d))
+                    * dtc)
+            scale_x, scale_y = SCALE_ATTR
+
+            x = int(x + math.cos(math.radians(360 - d)))
+            y = int(y + math.sin(math.radians(360 - self.angle)))
+            self.collision_pts[idx] = (x + int(scale_x/2), y + int(scale_y/2))
+
+            idx += 1
 
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
         self.radars.clear()
@@ -149,8 +151,8 @@ class Creature(pygame.sprite.Sprite):
 
                 self.image = self.images[self.index]
             self.img = self.image
-            self.img = pygame.transform.rotate(self.image, self.angle - 90)
-            # self.img = self.rotate_center(self.img)
+            # self.img = pygame.transform.rotate(self.image, self.angle - 90)
+            self.img = self.rotate_center(self.img)
             screen.blit(self.img, (self.x, self.y))
 
             # length = 0.5 * SCALE_ATTR[0]
