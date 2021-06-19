@@ -66,7 +66,7 @@ class Creature(pygame.sprite.Sprite):
     def draw_radar(self, screen):
         for radar in self.radars:
             position = radar[0]
-            pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
+            pygame.draw.line(screen, (0, 255, 0), (self.x + (SCALE_ATTR[0]/2), self.y + (SCALE_ATTR[1]/2)), position, 1)
             pygame.draw.circle(screen, (0, 255, 0), position, 5)
 
     def check_radar_collision(self, screen: Surface, game_map: Surface):
@@ -89,16 +89,18 @@ class Creature(pygame.sprite.Sprite):
 
     def check_radar(self, degree, screen, game_map: pygame.Surface):
         length = 0
-        x = int(self.center[0] + math.cos(math.radians(360 - degree)) * length)
-        y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
+
+        center_x, center_y = (self.x + SCALE_ATTR[0]/2, self.y + SCALE_ATTR[1]/2)
+        x = int(center_x + math.cos(math.radians(360 - degree)) * length)
+        y = int(center_y + math.sin(math.radians(360 - degree)) * length)
 
         # Define a length for the radar
         while 0 < y < screen.get_height() and 0 < x < screen.get_width() \
                 and game_map.get_at((x, y)) == BORDER_COLOR \
                 and length < 300:
             length = length + 1
-            x = int(self.center[0] + math.cos(math.radians(360 - degree)) * length)
-            y = int(self.center[1] + math.sin(math.radians(360 - degree)) * length)
+            x = int(center_x + math.cos(math.radians(360 - degree)) * length)
+            y = int(center_y + math.sin(math.radians(360 - degree)) * length)
 
         # Calculate Distance To Border And Append To Radars List
         dist = int(math.sqrt(math.pow(x - self.x, 2) + math.pow(y - self.y, 2)))
@@ -139,6 +141,7 @@ class Creature(pygame.sprite.Sprite):
 
     def draw(self, screen, game_map):
         self.update(screen, game_map)
+
         if self.alive:
             self.frames += 1
 
@@ -155,13 +158,7 @@ class Creature(pygame.sprite.Sprite):
             self.img = self.rotate_center(self.img)
             screen.blit(self.img, (self.x, self.y))
 
-            # length = 0.5 * SCALE_ATTR[0]
-            # left_top = [self.x + math.cos(math.radians(360 - (self.angle - 90))) * length,
-            #             self.y + math.sin(math.radians(360 - (self.angle - 90))) * length]
-            # pygame.draw.circle(screen, (255, 255, 0), left_top, 5)
-
-            # pygame.transform.rotate(self.collider, self.angle)
-            # self.collider.drawCollider(screen, self.x, self.y)
+            self.draw_radar(screen)
             # for pt in self.collision_pts:
             #     pygame.draw.circle(screen, (255, 255, 0), pt, 5)
 
