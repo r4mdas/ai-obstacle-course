@@ -51,6 +51,9 @@ class Creature(pygame.sprite.Sprite):
         self.radars = []
 
         self.angle = 0
+        self.start_x = self.x
+        self.start_y = self.y
+
         self.collision_pts = [(0, 0), (0, 0), (0, 0), (0, 0)
                               , (0, 0), (0, 0), (0, 0), (0, 0)]
 
@@ -178,10 +181,10 @@ class Creature(pygame.sprite.Sprite):
             self.angle += 2
         elif choice == 1:
             self.angle -= 2
-        elif choice >= 2:
-            speed_choices = [0.6, 0.7, 0.75, 0.8, 0.9, 0.95, 1, 1.05, 1.1, 1.2, 1.5]
+        elif choice == 2:
+            speed_choices = [1.5]
             chosen_speed = random.choice(speed_choices)
-            self.speed = 2 * chosen_speed
+            self.speed = 1.5 * chosen_speed
 
         if self.angle != 0:
             self.angle = self.angle % 360

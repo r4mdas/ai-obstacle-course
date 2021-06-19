@@ -4,6 +4,7 @@ import neat
 import os
 import sys
 import math
+from creature import SCALE_ATTR
 
 WIDTH = 1280
 HEIGHT = 720
@@ -41,10 +42,10 @@ def draw_hud(screen, creatures, elapsed_time):
 
 
 def game_start(genomes, config):
-    global gen, event
+    global gen
 
     elapsed_time = 0
-    target_x, target_y = (WIDTH/2, 75)
+    target_x, target_y = (WIDTH - 350, 100)
     gen += 1
     pygame.init()
     pygame.display.set_caption(CAPTION)
@@ -64,7 +65,7 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        c = Creature(1, WIDTH / 2 - 250, HEIGHT - 380, 15)
+        c = Creature(1, WIDTH / 2 - 250, 280, 15)
         creatures.append(c)
         ge.append(genome)
 
@@ -104,7 +105,7 @@ def game_start(genomes, config):
             # ge.pop(creatures.index(c))
             # creatures.pop(creatures.index(c))
 
-        # pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
+        pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
         for c in creatures:
             c.draw(screen, game_map)
@@ -118,17 +119,21 @@ def game_start(genomes, config):
             c.collision = c.check_radar_collision(screen, game_map)
 
             if c.collision:
-                # print("Popped by bounds collision")
-                ge[creatures.index(c)].fitness = -10
+                genomes[i][1].fitness -= 25
+                # ge[creatures.index(c)].fitness -= 50
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
-                # init_distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (c.y - target_y) ** 2))
+                init_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
                 # cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
-                # distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
+                distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
+                d_factor: float = (float(init_distance / distance))
 
-                genomes[i][1].fitness += time
+                if d_factor < 0:
+                    d_factor = 0
+                genomes[i][1].fitness += d_factor + (c.speed/(SCALE_ATTR[0]/2))
+
                 # max(0, (1 - (distance/screen.get_height())))
                 # = ((init_distance - cur_distance) * 100) / init_distance
 
