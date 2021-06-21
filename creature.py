@@ -2,7 +2,6 @@ import pygame
 import math
 from pygame import Surface
 import random
-from creature_collider import CreatureCollider
 
 BORDER_COLOR = (0, 220, 50, 255)
 
@@ -157,7 +156,6 @@ class Creature(pygame.sprite.Sprite):
 
                 self.image = self.images[self.index]
             self.img = self.image
-            # self.img = pygame.transform.rotate(self.image, self.angle - 90)
             self.img = self.rotate_center(self.img)
             screen.blit(self.img, (self.x, self.y))
 

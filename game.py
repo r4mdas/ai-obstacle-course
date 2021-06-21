@@ -52,7 +52,7 @@ def game_start(genomes, config):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
-    game_map = pygame.image.load('art/Maze.png').convert()
+    game_map = pygame.image.load('art/Maze-v2.png').convert()
 
     game_surf = pygame.Surface((WIDTH, HEIGHT))
     game_surf.fill((200, 255, 0))
@@ -65,7 +65,7 @@ def game_start(genomes, config):
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        c = Creature(1, WIDTH / 2 - 250, 280, 15)
+        c = Creature(1, WIDTH / 2 - 250, 320, 15)
         creatures.append(c)
         ge.append(genome)
 
@@ -91,27 +91,10 @@ def game_start(genomes, config):
             #         c.action_on_input(1)
             #
 
-            # output_str = ''
-            # for s in output:
-            #     output_str += str(round(s, 3)) + ","
-
-            # print(output_str)
-
-            # c.set_input_choice(choice)
-            # if not c.set_input_choice(choice):
-            # print("Popped by paralysis")
-            # ge[creatures.index(c)].fitness = 0
-            # nets.pop(creatures.index(c))
-            # ge.pop(creatures.index(c))
-            # creatures.pop(creatures.index(c))
-
         pygame.draw.circle(screen, (0, 255, 0), (target_x, target_y), 15)
 
         for c in creatures:
             c.draw(screen, game_map)
-            # gets_hit = pygame.sprite.collide_circle(c, c)
-            # if gets_hit:
-            #     print("Creature " + str(c.id) + " got hit!")
 
         time = draw_hud(screen, creatures, elapsed_time)
 
@@ -119,23 +102,18 @@ def game_start(genomes, config):
             c.collision = c.check_radar_collision(screen, game_map)
 
             if c.collision:
-                genomes[i][1].fitness -= 25
-                # ge[creatures.index(c)].fitness -= 50
+                genomes[i][1].fitness -= 30
                 nets.pop(creatures.index(c))
                 ge.pop(creatures.index(c))
                 creatures.pop(creatures.index(c))
             else:
                 init_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
-                # cur_distance = int(math.sqrt((float(c.start_x) - target_x) ** 2 + (c.start_y - target_y) ** 2))
                 distance = int(math.sqrt((float(c.x) - target_x) ** 2 + (float(c.y) - target_y) ** 2))
                 d_factor: float = (float(init_distance / distance))
 
                 if d_factor < 0:
                     d_factor = 0
                 genomes[i][1].fitness += d_factor + (c.speed/(SCALE_ATTR[0]/2))
-
-                # max(0, (1 - (distance/screen.get_height())))
-                # = ((init_distance - cur_distance) * 100) / init_distance
 
         if time > 20:
             game_loop = False
